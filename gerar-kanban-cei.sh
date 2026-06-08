@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Gera HTML estático do kanban CEI Apps - UFG
+# Gera HTML estático do kanban (GitHub Projects)
 # Uso: ./gerar-kanban-cei.sh
 
 set -euo pipefail

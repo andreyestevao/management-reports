@@ -1,4 +1,4 @@
-/* Burnup CEI — reutiliza estilos do burndown */
+/* Burnup — reutiliza estilos do burndown */
 @import url('burndown-cei.css');
 
 .painel-grafico-burnup .grafico-container {

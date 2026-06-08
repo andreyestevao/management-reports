@@ -1,4 +1,4 @@
-# WIP por pessoa CEI — incorporação e tema
+# WIP por pessoa — incorporação e tema
 
 Work in progress por responsável.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/wip-pessoa-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="WIP por pessoa CEI"
+  title="WIP por pessoa"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

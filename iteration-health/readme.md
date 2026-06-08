@@ -1,4 +1,4 @@
-# Iteration health CEI — incorporação e tema
+# Iteration health — incorporação e tema
 
 Radar e métricas de saúde da iteration.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/iteration-health-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Iteration health CEI"
+  title="Iteration health"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

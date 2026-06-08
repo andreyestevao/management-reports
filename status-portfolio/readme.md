@@ -1,4 +1,4 @@
-# Status portfolio CEI — incorporação e tema
+# Status portfolio — incorporação e tema
 
 Distribuição de status de todo o board.
 
@@ -28,7 +28,7 @@ Visão agregada do board (sem iteration obrigatória).
 ```html
 <iframe
   src="http://127.0.0.1:8766/status-portfolio-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente"
-  title="Status portfolio CEI"
+  title="Status portfolio"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

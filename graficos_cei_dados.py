@@ -1,4 +1,4 @@
-"""APIs JSON para gráficos analíticos do board CEI."""
+"""APIs JSON para gráficos analíticos do board."""
 
 from __future__ import annotations
 

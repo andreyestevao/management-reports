@@ -1,4 +1,4 @@
-# Throughput CEI — incorporação e tema
+# Throughput — incorporação e tema
 
 Itens concluídos nas últimas iterations encerradas.
 
@@ -28,7 +28,7 @@ Visão agregada do board (sem iteration obrigatória).
 ```html
 <iframe
   src="http://127.0.0.1:8766/throughput-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente"
-  title="Throughput CEI"
+  title="Throughput"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

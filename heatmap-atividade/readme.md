@@ -1,4 +1,4 @@
-# Heatmap atividade CEI — incorporação e tema
+# Heatmap atividade — incorporação e tema
 
 Conclusões por dia da semana (90 dias).
 
@@ -28,7 +28,7 @@ Visão agregada do board (sem iteration obrigatória).
 ```html
 <iframe
   src="http://127.0.0.1:8766/heatmap-atividade-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente"
-  title="Heatmap atividade CEI"
+  title="Heatmap atividade"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

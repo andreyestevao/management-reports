@@ -149,7 +149,7 @@ def _coletar_escopo_iteracao(
 
 
 def buscar_gantt(
-    proprietario: str = "CEI-UFG",
+    proprietario: str,
     numero: int = 1,
     consulta: str = "",
     situacao_filtro: str | None = None,

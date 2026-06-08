@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Gera HTML estático do kanban do GitHub Project CEI Apps - UFG.
+Gera HTML estático do kanban a partir do GitHub Projects.
 
 Requer: gh autenticado com escopo read:project (ou project).
 Saída padrão: kanban-cei-apps.html e kanban-cei-apps-incorporar.html
@@ -14,6 +14,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from config_projeto import ler_numero_projeto, ler_proprietario
 from kanban_cei_dados import (
     COR_COLUNA,
     agrupar_por_coluna,
@@ -102,7 +103,7 @@ def montar_html(
     modo_incorporar: bool = False,
 ) -> str:
     """Monta documento HTML completo."""
-    titulo_projeto = html.escape(projeto.get("title", "CEI Apps"))
+    titulo_projeto = html.escape(projeto.get("title", "GitHub Project"))
     url_projeto = html.escape(projeto.get("url", ""))
     total = sum(len(v) for v in colunas.values())
     data_geracao = gerado_em.strftime("%d/%m/%Y %H:%M UTC")
@@ -131,8 +132,8 @@ def montar_html(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Gera kanban estático do project CEI Apps - UFG")
-    parser.add_argument("--proprietario", default="CEI-UFG", help="Owner do project (padrão: CEI-UFG)")
+    parser = argparse.ArgumentParser(description="Gera kanban estático a partir do GitHub Projects")
+    parser.add_argument("--proprietario", default=None, help="Owner do project (ou GH_PROJECT_OWNER)")
     parser.add_argument("--projeto", type=int, default=1, help="Número do project (padrão: 1)")
     parser.add_argument(
         "--saida",
@@ -142,9 +143,12 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    proprietario = ler_proprietario(args.proprietario)
+    numero = ler_numero_projeto(args.projeto)
+
     try:
-        projeto = carregar_projeto(args.proprietario, args.projeto)
-        itens = carregar_itens(args.proprietario, args.projeto)
+        projeto = carregar_projeto(proprietario, numero)
+        itens = carregar_itens(proprietario, numero)
     except subprocess.CalledProcessError as erro:
         print(f"Erro ao consultar GitHub: {erro.stderr or erro}", file=sys.stderr)
         print("Verifique: gh auth status (escopo read:project)", file=sys.stderr)

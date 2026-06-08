@@ -18,15 +18,34 @@ build/
 .coverage
 htmlcov/
 
-# Runtime / dados locais (snapshots gerados pelo servidor)
-dados/burndown-historico.json
-
-# Ambiente e segredos
+# Configuração local (nunca versionar)
 .env
 .env.*
 !.env.example
+config.local.json
+*.local.json
+*.local.yaml
+*.local.yml
+
+# Credenciais e chaves
 *.pem
 *.key
+*.p12
+*.pfx
+*.token
+id_rsa
+id_rsa.pub
+credentials.json
+secrets.json
+**/secrets/
+
+# Runtime / dados locais do board
+dados/*.json
+!dados/*.example.json
+
+# Snapshots HTML estáticos (contêm dados reais do project)
+kanban-cei-apps.html
+kanban-cei-apps-incorporar.html
 
 # SO / editor
 .DS_Store
@@ -42,7 +61,3 @@ Thumbs.db
 *.log
 *.tmp
 .cache/
-
-# Kanban estático regenerável (opcional — descomente se não quiser versionar)
-# kanban-cei-apps.html
-# kanban-cei-apps-incorporar.html

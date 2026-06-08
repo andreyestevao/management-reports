@@ -1,4 +1,4 @@
-# Monte Carlo CEI — incorporação e tema
+# Monte Carlo — incorporação e tema
 
 Simulação de prazo com throughput histórico.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/monte-carlo-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Monte Carlo CEI"
+  title="Monte Carlo"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

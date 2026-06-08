@@ -1,4 +1,4 @@
-# Mapa por repositório CEI — incorporação e tema
+# Mapa por repositório — incorporação e tema
 
 Distribuição do escopo por repo.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/mapa-repositorio-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Mapa por repositório CEI"
+  title="Mapa por repositório"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

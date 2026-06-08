@@ -28,6 +28,7 @@ from urllib.parse import parse_qs, urlparse
 
 from burnup_cei_dados import buscar_burnup
 from burndown_cei_dados import buscar_burndown, buscar_iteracoes
+from config_projeto import ler_numero_projeto, ler_proprietario
 from gantt_cei_dados import buscar_gantt
 from graficos_cei_dados import ROTAS_GRAFICOS
 from kanban_cei_dados import buscar_kanban
@@ -35,7 +36,7 @@ from kanban_cei_dados import buscar_kanban
 DIR_BASE = Path(__file__).resolve().parent
 
 
-class ManipuladorCeiBoard(SimpleHTTPRequestHandler):
+class ManipuladorBoard(SimpleHTTPRequestHandler):
     """Serve arquivos estáticos e APIs JSON do board."""
 
     proprietario: str
@@ -154,7 +155,7 @@ class ManipuladorCeiBoard(SimpleHTTPRequestHandler):
 def criar_manipulador(proprietario: str, numero_projeto: int):
     """Factory do handler HTTP com config do project."""
 
-    class Manipulador(ManipuladorCeiBoard):
+    class Manipulador(ManipuladorBoard):
         def __init__(self, *args, **kwargs):
             self.proprietario = proprietario
             self.numero_projeto = numero_projeto
@@ -166,11 +167,13 @@ def criar_manipulador(proprietario: str, numero_projeto: int):
 def main() -> int:
     parser = argparse.ArgumentParser(description="Servidor management-reports (kanban, burndown, burnup, gantt e gráficos)")
     parser.add_argument("--porta", type=int, default=8766, help="Porta HTTP (padrão: 8766)")
-    parser.add_argument("--proprietario", default="CEI-UFG")
-    parser.add_argument("--projeto", type=int, default=1)
+    parser.add_argument("--proprietario", default=None, help="Owner/org do GitHub Project (ou GH_PROJECT_OWNER)")
+    parser.add_argument("--projeto", type=int, default=None, help="Número do project (ou GH_PROJECT_NUMBER, padrão 1)")
     args = parser.parse_args()
 
-    handler = criar_manipulador(args.proprietario, args.projeto)
+    proprietario = ler_proprietario(args.proprietario)
+    numero_projeto = ler_numero_projeto(args.projeto)
+    handler = criar_manipulador(proprietario, numero_projeto)
     servidor = ThreadingHTTPServer(("127.0.0.1", args.porta), handler)
     base = f"http://127.0.0.1:{args.porta}"
     print(f"Kanban:    {base}/kanban-cei-dinamico.html")

@@ -1,4 +1,4 @@
-# Burndown CEI — incorporação e tema
+# Burndown — incorporação e tema
 
 Gráfico de burndown por iteration do GitHub Projects, com métricas de velocidade e escopo de itens.
 
@@ -27,7 +27,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/burndown-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Burndown CEI"
+  title="Burndown"
   style="width:100%;min-height:720px;border:0"
 ></iframe>
 ```

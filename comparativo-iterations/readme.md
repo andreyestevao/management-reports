@@ -1,4 +1,4 @@
-# Comparativo iterations CEI — incorporação e tema
+# Comparativo iterations — incorporação e tema
 
 Restante normalizado por dia entre iterations.
 
@@ -28,7 +28,7 @@ Visão agregada do board (sem iteration obrigatória).
 ```html
 <iframe
   src="http://127.0.0.1:8766/comparativo-iterations-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente"
-  title="Comparativo iterations CEI"
+  title="Comparativo iterations"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

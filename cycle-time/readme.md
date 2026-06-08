@@ -1,4 +1,4 @@
-# Cycle Time CEI — incorporação e tema
+# Cycle Time — incorporação e tema
 
 Histograma de dias até conclusão na iteration.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/cycle-time-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Cycle Time CEI"
+  title="Cycle Time"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

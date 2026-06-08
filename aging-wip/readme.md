@@ -1,4 +1,4 @@
-# Aging WIP CEI — incorporação e tema
+# Aging WIP — incorporação e tema
 
 Idade dos itens não concluídos.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/aging-wip-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Aging WIP CEI"
+  title="Aging WIP"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

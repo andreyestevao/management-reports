@@ -1,4 +1,4 @@
-# Taxa de conclusão CEI — incorporação e tema
+# Taxa de conclusão — incorporação e tema
 
 Percentual entregue por iteration.
 
@@ -28,7 +28,7 @@ Visão agregada do board (sem iteration obrigatória).
 ```html
 <iframe
   src="http://127.0.0.1:8766/taxa-conclusao-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente"
-  title="Taxa de conclusão CEI"
+  title="Taxa de conclusão"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

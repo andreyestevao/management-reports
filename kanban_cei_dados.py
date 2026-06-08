@@ -1,4 +1,4 @@
-"""Consulta e normaliza dados do GitHub Project CEI Apps - UFG."""
+"""Consulta e normaliza dados do GitHub Projects."""
 
 from __future__ import annotations
 
@@ -131,7 +131,7 @@ def agrupar_por_coluna(itens_brutos: list[dict]) -> dict[str, list[dict]]:
     return ordenado
 
 
-def buscar_kanban(proprietario: str = "CEI-UFG", numero: int = 1) -> dict:
+def buscar_kanban(proprietario: str, numero: int = 1) -> dict:
     """Retorna payload JSON do kanban agrupado por coluna."""
     projeto = carregar_projeto(proprietario, numero)
     itens_brutos = carregar_itens(proprietario, numero)
@@ -140,7 +140,7 @@ def buscar_kanban(proprietario: str = "CEI-UFG", numero: int = 1) -> dict:
 
     return {
         "projeto": {
-            "titulo": projeto.get("title", "CEI Apps"),
+            "titulo": projeto.get("title", "GitHub Project"),
             "url": projeto.get("url", ""),
             "numero": projeto.get("number", numero),
             "proprietario": proprietario,

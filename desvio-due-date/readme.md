@@ -1,4 +1,4 @@
-# Desvio Due Date CEI — incorporação e tema
+# Desvio Due Date — incorporação e tema
 
 Scatter Due Date vs data de conclusão.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/desvio-due-date-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Desvio Due Date CEI"
+  title="Desvio Due Date"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

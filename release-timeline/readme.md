@@ -1,4 +1,4 @@
-# Release timeline CEI — incorporação e tema
+# Release timeline — incorporação e tema
 
 Janelas temporais das iterations.
 
@@ -28,7 +28,7 @@ Visão agregada do board (sem iteration obrigatória).
 ```html
 <iframe
   src="http://127.0.0.1:8766/release-timeline-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente"
-  title="Release timeline CEI"
+  title="Release timeline"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

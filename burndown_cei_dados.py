@@ -1,4 +1,4 @@
-"""Burndown por iteration do GitHub Project CEI Apps - UFG."""
+"""Burndown por iteration do GitHub Projects."""
 
 from __future__ import annotations
 
@@ -414,7 +414,7 @@ def _filtrar_iteracoes(lista: list[dict], consulta: str) -> list[dict]:
 
 
 def buscar_iteracoes(
-    proprietario: str = "CEI-UFG",
+    proprietario: str,
     numero: int = 1,
     consulta: str = "",
     offset: int = 0,
@@ -875,7 +875,7 @@ def _restante_no_dia(escopo: list[dict], dia: date, hoje: date) -> int:
 
 
 def buscar_burndown(
-    proprietario: str = "CEI-UFG",
+    proprietario: str,
     numero: int = 1,
     iteracao_id: str | None = None,
 ) -> dict:

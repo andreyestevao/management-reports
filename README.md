@@ -1,8 +1,50 @@
 # management-reports
 
-Monorepo de relatórios e visualizações para GitHub Projects (CEI Apps - UFG): kanban, burndown, burnup, gantt e 16 gráficos analíticos. Servidor Python local + páginas HTML incorporáveis (iframe) com tema customizável.
+Relatórios e visualizações **agnósticos** para qualquer GitHub Project: kanban, burndown, burnup, gantt e 16 gráficos analíticos. Servidor Python local + páginas HTML incorporáveis (iframe) com tema customizável.
 
 Repositório: https://github.com/andreyestevao/management-reports
+
+## Regras do repositório
+
+Este projeto é **independente de organização, stack ou arquitetura interna**. Ao contribuir ou publicar alterações, siga:
+
+### Agnosticismo
+
+| Regra | Descrição |
+|-------|-----------|
+| **Sem acoplamento organizacional** | Não documente org, produto ou arquitetura específicos. **Proibido** citar nomes reais de organização ou programa em README, exemplos e valores padrão. |
+| **Configuração explícita** | O GitHub Project alvo vem de `GH_PROJECT_OWNER` / `GH_PROJECT_NUMBER` ou de `--proprietario` / `--projeto` — nunca hardcode org ou número no código ou na documentação. |
+| **Linguagem genérica** | README, readmes das views e textos visíveis ao usuário devem falar em **GitHub Projects**, iterations e board — não em contexto de um cliente ou programa específico. |
+| **Temas neutros** | Presets em `temas/` usam nomes genéricos (`escuro`, `claro`, `transparente`, `institucional`). Cores e identidade visual ficam no CSS customizado de quem incorpora o iframe. |
+
+> Nomes históricos de arquivos (`cei-tokens.css`, `*-cei-dinamico.html`, etc.) são legado interno de paths/URLs — **não** devem ser reintroduzidos em documentação nem em valores padrão de configuração.
+
+### Arquivos sensíveis — nunca versionar
+
+| Categoria | Exemplos | Motivo |
+|-----------|----------|--------|
+| **Ambiente** | `.env`, `.env.local` | Owner do project, parâmetros locais |
+| **Credenciais** | `*.pem`, `*.key`, `credentials.json`, tokens | Segurança |
+| **Snapshots do board** | `dados/burndown-historico.json`, `dados/*.json` | Dados reais de iterations e métricas |
+| **HTML estático gerado** | `kanban-cei-apps.html`, `kanban-cei-apps-incorporar.html` | Contém títulos e links de issues reais |
+
+**Permitido no Git:** apenas templates vazios ou estruturais, como `dados/burndown-historico.example.json` e `.env.example` (sem valores reais).
+
+### Antes de cada commit
+
+```bash
+./scripts/verificar-arquivos-sensiveis.sh --staged
+```
+
+O script bloqueia `.env`, snapshots em `dados/`, HTML estático do kanban, credenciais e padrões de token GitHub no diff. O `.gitignore` reforça as mesmas regras — **não conte só com ele**; rode a verificação manualmente.
+
+### Autenticação
+
+- Token e sessão ficam **somente** no `gh` CLI local (`gh auth login`, escopo `read:project`).
+- O servidor **não** lê nem expõe tokens nas páginas ou respostas da API.
+- Não adicione `GITHUB_TOKEN`, PAT ou secrets em arquivos do repositório.
+
+---
 
 ## Requisitos
 
@@ -14,29 +56,44 @@ gh auth login
 gh auth refresh -s read:project
 ```
 
+## Configuração
+
+Defina o project alvo via variáveis de ambiente ou argumentos do servidor:
+
+```bash
+cp .env.example .env
+# Edite .env: GH_PROJECT_OWNER e GH_PROJECT_NUMBER
+```
+
+| Variável | Descrição |
+|----------|-----------|
+| `GH_PROJECT_OWNER` | Org ou usuário dono do GitHub Project (**obrigatório**) |
+| `GH_PROJECT_NUMBER` | Número do project (padrão `1`) |
+
+Equivalente na CLI: `--proprietario` e `--projeto`. O script `iniciar-kanban-dinamico.sh` carrega `.env` automaticamente se existir.
+
 ## Início rápido
 
 ```bash
 git clone https://github.com/andreyestevao/management-reports.git
 cd management-reports
+cp .env.example .env   # preencha GH_PROJECT_OWNER
 cp dados/burndown-historico.example.json dados/burndown-historico.json  # opcional
 ./iniciar-kanban-dinamico.sh
-# ou: python3 servidor-kanban-cei.py
 ```
 
 Abra http://127.0.0.1:8766/kanban-cei-dinamico.html
-
-Parâmetros do servidor: `--porta`, `--proprietario` (padrão `CEI-UFG`), `--projeto` (padrão `1`).
 
 ## Estrutura do monorepo
 
 | Pacote / pasta | Conteúdo |
 |----------------|----------|
-| **Raiz** | `servidor-kanban-cei.py`, módulos Python (`*_cei_dados.py`), assets compartilhados (`cei-tokens.css`, `cei-tema.js`, …) |
+| **Raiz** | `servidor-kanban-cei.py`, módulos Python (`*_dados.py`), assets compartilhados |
 | `kanban/`, `burndown/`, `burnup/`, `gantt/` | Documentação e embed de cada view principal |
 | `cfd/`, `cycle-time/`, … (16 pastas) | Documentação de cada gráfico analítico |
-| `temas/` | Presets CSS (`escuro`, `claro`, `transparente`, `cei-ui`) |
-| `dados/` | Snapshots locais (`burndown-historico.json`, gitignored — ver `.example`) |
+| `temas/` | Presets CSS (`escuro`, `claro`, `transparente`, `institucional`) |
+| `dados/` | Snapshots locais (gitignored — ver `*.example.json`) |
+| `scripts/` | Utilitários (`verificar-arquivos-sensiveis.sh`) |
 
 ## Views principais
 
@@ -49,9 +106,7 @@ Parâmetros do servidor: `--porta`, `--proprietario` (padrão `CEI-UFG`), `--pro
 
 ## Gráficos analíticos
 
-`/cfd-cei-dinamico.html`, `/cycle-time-cei-dinamico.html`, `/throughput-cei-dinamico.html`, `/monte-carlo-cei-dinamico.html`, `/desvio-due-date-cei-dinamico.html`, `/scope-creep-cei-dinamico.html`, `/taxa-conclusao-cei-dinamico.html`, `/carga-responsavel-cei-dinamico.html`, `/wip-pessoa-cei-dinamico.html`, `/mapa-repositorio-cei-dinamico.html`, `/release-timeline-cei-dinamico.html`, `/aging-wip-cei-dinamico.html`, `/status-portfolio-cei-dinamico.html`, `/heatmap-atividade-cei-dinamico.html`, `/iteration-health-cei-dinamico.html`, `/comparativo-iterations-cei-dinamico.html`
-
-Cada pasta `{app}/readme.md` descreve iframe, query string e tokens de tema.
+16 views em `*-cei-dinamico.html` (CFD, cycle time, throughput, Monte Carlo, etc.). Cada pasta `{app}/readme.md` descreve iframe, query string e tokens de tema.
 
 ## API REST
 
@@ -62,14 +117,14 @@ Cada pasta `{app}/readme.md` descreve iframe, query string e tokens de tema.
 | `GET /api/burnup?iteracao=` | Burnup da iteration |
 | `GET /api/gantt` | Roadmap / gantt |
 | `GET /api/iteracoes?q=&offset=&limit=` | Autocomplete de iterations |
-| `GET /api/{grafico}` | Gráficos (`cfd`, `cycle-time`, …) |
+| `GET /api/{grafico}` | Gráficos analíticos |
 
 ## Incorporação (iframe)
 
 ```html
 <iframe
   src="http://127.0.0.1:8766/burnup-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=ID"
-  title="Burnup CEI"
+  title="Burnup"
   style="width:100%;min-height:720px;border:0"
 ></iframe>
 ```
@@ -77,20 +132,11 @@ Cada pasta `{app}/readme.md` descreve iframe, query string e tokens de tema.
 ## Scripts utilitários
 
 ```bash
-./gerar-kanban-cei.sh              # HTML estático do kanban
-python3 gerar-paginas-graficos-cei.py   # Regenera HTML + readme dos gráficos
+./gerar-kanban-cei.sh                    # HTML estático local (gitignored — ver regras acima)
+python3 gerar-paginas-graficos-cei.py    # Regenera HTML + readme dos gráficos
+./scripts/verificar-arquivos-sensiveis.sh --staged   # Obrigatório antes de commit
 ```
-
-## Dados locais
-
-Na primeira execução, copie o exemplo se quiser iniciar vazio:
-
-```bash
-cp dados/burndown-historico.example.json dados/burndown-historico.json
-```
-
-O servidor atualiza snapshots automaticamente para iterations ativas.
 
 ## Licença
 
-Uso interno / CEI-UFG. Ajuste conforme política da organização.
+Ajuste conforme a política da sua organização.

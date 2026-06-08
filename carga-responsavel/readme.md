@@ -1,4 +1,4 @@
-# Carga por responsável CEI — incorporação e tema
+# Carga por responsável — incorporação e tema
 
 Itens abertos por pessoa na iteration.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/carga-responsavel-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Carga por responsável CEI"
+  title="Carga por responsável"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

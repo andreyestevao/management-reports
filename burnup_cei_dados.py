@@ -58,7 +58,7 @@ def _montar_grafico_burnup(dados_burndown: dict) -> dict:
 
 
 def buscar_burnup(
-    proprietario: str = "CEI-UFG",
+    proprietario: str,
     numero: int = 1,
     iteracao_id: str | None = None,
 ) -> dict:

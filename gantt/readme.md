@@ -1,4 +1,4 @@
-# Gantt CEI — incorporação e tema
+# Gantt — incorporação e tema
 
 Roadmap cronológico por iterations: barras de iteration, previsto (Due Date), conclusão real e atraso.
 
@@ -25,7 +25,7 @@ URL local: http://127.0.0.1:8766/gantt-cei-dinamico.html
 ```html
 <iframe
   src="http://127.0.0.1:8766/gantt-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente"
-  title="Gantt CEI"
+  title="Gantt"
   style="width:100%;min-height:600px;border:0"
 ></iframe>
 ```

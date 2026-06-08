@@ -1,4 +1,4 @@
-# Burnup CEI — incorporação e tema
+# Burnup — incorporação e tema
 
 Gráfico de burnup por iteration: escopo total, conclusão acumulada e linha ideal de entrega. Compartilha dados e snapshots com o burndown.
 
@@ -27,7 +27,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/burnup-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="Burnup CEI"
+  title="Burnup"
   style="width:100%;min-height:720px;border:0"
 ></iframe>
 ```

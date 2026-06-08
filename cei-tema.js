@@ -1,5 +1,5 @@
 /**
- * Tema incorporável — Kanban, Burndown e Gantt CEI.
+ * Tema incorporável — views dinâmicas do management-reports.
  * Query: ?tema=escuro&css=/temas/meu.css&cor-primaria=006633&embed=1&sem-rodape=1&fundo=transparente
  * postMessage: { tipo: 'cei-aplicar-tema', tokens: { '--cor-primaria': '#006633' }, corpo: { adicionar: ['ocultar-rodape'] } }
  */
@@ -11,7 +11,8 @@
     escuro: 'temas/escuro.css',
     claro: 'temas/claro.css',
     transparente: 'temas/transparente.css',
-    'cei-ui': 'temas/cei-ui.css',
+    institucional: 'temas/institucional.css',
+    'cei-ui': 'temas/institucional.css',
   };
 
   /** Parâmetros de URL → variáveis CSS (--cor-primaria, etc.) */

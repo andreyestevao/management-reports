@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera HTML e readme.md para cada gráfico CEI."""
+"""Gera HTML e readme.md para cada gráfico analítico."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CEI Apps — {nome}</title>
+  <title>Management Reports — {nome}</title>
   <link rel="stylesheet" href="cei-tokens.css">
   <link rel="stylesheet" href="cei-compartilhado.css">
   <link rel="stylesheet" href="cei-graficos.css">
@@ -81,7 +81,7 @@ CONTROLES_ITERACAO = """
         <ul id="lista-sugestoes-iteracao" class="lista-sugestoes" role="listbox" hidden></ul>
       </div>"""
 
-README_TEMPLATE = """# {nome} CEI — incorporação e tema
+README_TEMPLATE = """# {nome} — incorporação e tema
 
 {descricao}
 
@@ -111,7 +111,7 @@ URL local: http://127.0.0.1:8766/{id}-cei-dinamico.html
 ```html
 <iframe
   src="http://127.0.0.1:8766/{id}-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente{iteracao_exemplo}"
-  title="{nome} CEI"
+  title="{nome}"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```

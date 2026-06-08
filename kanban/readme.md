@@ -1,4 +1,4 @@
-# Kanban CEI — incorporação e tema
+# Kanban — incorporação e tema
 
 Visualização do board GitHub Projects (colunas e cartões), servida pelo servidor local do repositório [management-reports](https://github.com/andreyestevao/management-reports).
 
@@ -23,14 +23,14 @@ URLs locais (servidor na porta **8766**):
 | `cei-compartilhado.css` | Botões, embed, rodapé |
 | `kanban-cei.css` | Grade, colunas, cartões |
 | `cei-tema.js` | Presets, query string, `postMessage` |
-| `temas/*.css` | Presets (`escuro`, `claro`, `transparente`, `cei-ui`) |
+| `temas/*.css` | Presets (`escuro`, `claro`, `transparente`, `institucional`) |
 
 ## Iframe
 
 ```html
 <iframe
   src="http://127.0.0.1:8766/kanban-cei-dinamico.html?embed=1&sem-rodape=1&sem-controles=1&fundo=transparente"
-  title="Kanban CEI"
+  title="Kanban"
   style="width:100%;min-height:420px;border:0"
 ></iframe>
 ```
@@ -39,7 +39,7 @@ URLs locais (servidor na porta **8766**):
 
 | Parâmetro | Exemplo | Efeito |
 |-----------|---------|--------|
-| `tema` | `escuro`, `claro`, `transparente`, `cei-ui` | Preset em `temas/` |
+| `tema` | `escuro`, `claro`, `transparente`, `institucional` | Preset em `temas/` |
 | `css` | `/temas/exemplo-portal.css` | Folha custom (mesma origem) |
 | `embed` | `1` | Padding reduzido |
 | `sem-rodape` | `1` | Oculta rodapé |
@@ -52,7 +52,7 @@ URLs locais (servidor na porta **8766**):
 Exemplo:
 
 ```
-/kanban-cei-dinamico.html?tema=cei-ui&css=/temas/exemplo-portal.css&embed=1&sem-rodape=1
+/kanban-cei-dinamico.html?tema=institucional&css=/temas/exemplo-portal.css&embed=1&sem-rodape=1
 ```
 
 ## Folha CSS customizada

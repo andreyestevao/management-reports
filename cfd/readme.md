@@ -1,4 +1,4 @@
-# CFD CEI — incorporação e tema
+# CFD — incorporação e tema
 
 Fluxo acumulado por status ao longo da iteration.
 
@@ -28,7 +28,7 @@ Iteration específica: `?iteracao=<id>` (compatível com demais parâmetros de t
 ```html
 <iframe
   src="http://127.0.0.1:8766/cfd-cei-dinamico.html?embed=1&sem-rodape=1&fundo=transparente&iteracao=a5dfcb98"
-  title="CFD CEI"
+  title="CFD"
   style="width:100%;min-height:560px;border:0"
 ></iframe>
 ```
