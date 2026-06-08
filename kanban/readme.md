@@ -1,6 +1,6 @@
 # Kanban CEI — incorporação e tema
 
-Visualização do board GitHub Projects (colunas e cartões), servida pelo servidor local em `Documentos/CEI/gestao/`.
+Visualização do board GitHub Projects (colunas e cartões), servida pelo servidor local do repositório [management-reports](https://github.com/andreyestevao/management-reports).
 
 ## Páginas
 
@@ -105,7 +105,8 @@ Colunas usam `--cor-coluna` inline (cor vinda do GitHub Projects).
 ## Servidor
 
 ```bash
-cd /home/andrey/Documentos/CEI/gestao
+git clone https://github.com/andreyestevao/management-reports.git
+cd management-reports
 python3 servidor-kanban-cei.py
 ```
 

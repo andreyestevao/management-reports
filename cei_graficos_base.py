@@ -1,4 +1,4 @@
-"""Utilitários compartilhados para gráficos CEI Board."""
+"""Utilitários compartilhados para gráficos do management-reports."""
 
 from __future__ import annotations
 

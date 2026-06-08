@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Servidor CEI Board — kanban, burndown e gantt dinâmicos (GitHub Projects).
+Servidor management-reports — kanban, burndown e gantt dinâmicos (GitHub Projects).
 
 Endpoints:
   GET /api/kanban
@@ -164,7 +164,7 @@ def criar_manipulador(proprietario: str, numero_projeto: int):
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Servidor CEI Board (kanban, burndown, burnup, gantt e gráficos)")
+    parser = argparse.ArgumentParser(description="Servidor management-reports (kanban, burndown, burnup, gantt e gráficos)")
     parser.add_argument("--porta", type=int, default=8766, help="Porta HTTP (padrão: 8766)")
     parser.add_argument("--proprietario", default="CEI-UFG")
     parser.add_argument("--projeto", type=int, default=1)

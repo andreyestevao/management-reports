@@ -1,6 +1,8 @@
-# CEI Gestão Board — monorepo
+# management-reports
 
-Visualizações dinâmicas do GitHub Project **CEI Apps - UFG**: kanban, burndown, burnup, gantt e 16 gráficos analíticos. Servidor Python local + páginas HTML incorporáveis (iframe) com tema customizável.
+Monorepo de relatórios e visualizações para GitHub Projects (CEI Apps - UFG): kanban, burndown, burnup, gantt e 16 gráficos analíticos. Servidor Python local + páginas HTML incorporáveis (iframe) com tema customizável.
+
+Repositório: https://github.com/andreyestevao/management-reports
 
 ## Requisitos
 
@@ -15,6 +17,9 @@ gh auth refresh -s read:project
 ## Início rápido
 
 ```bash
+git clone https://github.com/andreyestevao/management-reports.git
+cd management-reports
+cp dados/burndown-historico.example.json dados/burndown-historico.json  # opcional
 ./iniciar-kanban-dinamico.sh
 # ou: python3 servidor-kanban-cei.py
 ```

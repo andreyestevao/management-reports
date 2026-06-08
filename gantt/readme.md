@@ -110,7 +110,8 @@ API: `window.ceiTema.lerToken('--cor-gantt-hoje')`.
 ## Servidor
 
 ```bash
-cd /home/andrey/Documentos/CEI/gestao
+git clone https://github.com/andreyestevao/management-reports.git
+cd management-reports
 python3 servidor-kanban-cei.py
 ```
 
