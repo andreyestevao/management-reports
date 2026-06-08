@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEI Apps — Kanban dinâmico</title>
+  <link rel="stylesheet" href="cei-tokens.css">
+  <link rel="stylesheet" href="cei-compartilhado.css">
+  <link rel="stylesheet" href="kanban-cei.css">
+  <script src="cei-tema.js"></script>
+</head>
+<body>
+  <div class="pagina pagina--incorporar" id="pagina-principal">
+    <div class="barra-acoes">
+      <button type="button" class="botao-atualizar" id="btn-atualizar">Atualizar agora</button>
+      <span class="status-carregamento" id="status">Consultando GitHub…</span>
+      <span class="indicador-atualizacao">Atualização automática a cada 5 min</span>
+    </div>
+
+    <div id="area-erro" class="mensagem-erro" hidden></div>
+    <div class="grade-kanban" id="grade-kanban"></div>
+    <footer class="rodape">Kanban dinâmico · dados via /api/kanban (gh CLI no servidor)</footer>
+  </div>
+
+  <script>
+    const grade = document.getElementById('grade-kanban');
+    const statusEl = document.getElementById('status');
+    const areaErro = document.getElementById('area-erro');
+    const btnAtualizar = document.getElementById('btn-atualizar');
+
+    function escapar(texto) {
+      const el = document.createElement('span');
+      el.textContent = texto ?? '';
+      return el.innerHTML;
+    }
+
+    function renderizarCartao(item) {
+      const meta = [];
+      if (item.responsaveis?.length) {
+        meta.push(`<div class="cartao-meta-linha"><span class="meta-responsavel">${escapar(item.responsaveis.join(', '))}</span></div>`);
+      }
+      if (item.dataLimiteFormatada) {
+        meta.push(`<div class="cartao-meta-linha"><span class="meta-prazo">📅 ${escapar(item.dataLimiteFormatada)}</span></div>`);
+      }
+      if (item.iteracao) {
+        meta.push(`<div class="cartao-meta-linha"><span class="meta-iteracao">${escapar(item.iteracao)}</span></div>`);
+      }
+      if (item.repositorioCurto) {
+        meta.push(`<div class="cartao-meta-linha"><span class="meta-repo">${escapar(item.repositorioCurto)}</span></div>`);
+      }
+
+      const titulo = item.url
+        ? `<a href="${escapar(item.url)}" target="_blank" rel="noopener noreferrer">${escapar(item.titulo)}</a>`
+        : escapar(item.titulo);
+
+      return `
+        <article class="cartao">
+          <header class="cartao-cabecalho">
+            <span class="cartao-numero">${item.numero ? '#' + item.numero : '—'}</span>
+          </header>
+          <h3 class="cartao-titulo">${titulo}</h3>
+          ${meta.length ? `<div class="cartao-meta">${meta.join('')}</div>` : ''}
+        </article>`;
+    }
+
+    function renderizarColuna(nome, itens, cor) {
+      const cartoes = itens.length
+        ? itens.map(renderizarCartao).join('')
+        : '<p class="coluna-vazia">Nenhum item</p>';
+
+      return `
+        <section class="coluna" style="--cor-coluna: ${cor}">
+          <header class="coluna-cabecalho">
+            <h2>${escapar(nome)}</h2>
+            <span class="coluna-contagem">${itens.length}</span>
+          </header>
+          <div class="coluna-cartoes">${cartoes}</div>
+        </section>`;
+    }
+
+    function formatarDataIso(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleString('pt-BR', { timeZone: 'UTC' }) + ' UTC';
+    }
+
+    function renderizarKanban(dados) {
+      document.title = `${dados.projeto.titulo} — Kanban`;
+
+      const html = dados.colunasOrdem.map((nome) => {
+        const itens = dados.colunas[nome] || [];
+        const cor = dados.coresColuna[nome] || '#6c757d';
+        return renderizarColuna(nome, itens, cor);
+      }).join('');
+
+      grade.innerHTML = html;
+    }
+
+    async function carregarKanban() {
+      btnAtualizar.disabled = true;
+      statusEl.textContent = 'Consultando GitHub…';
+      areaErro.hidden = true;
+
+      try {
+        const resposta = await fetch('/api/kanban', { cache: 'no-store' });
+        const dados = await window.ceiApi.lerRespostaJson(resposta);
+
+        if (!resposta.ok) {
+          throw new Error(dados.detalhe || dados.erro || `HTTP ${resposta.status}`);
+        }
+
+        renderizarKanban(dados);
+        statusEl.textContent = `${dados.totalItens} itens · atualizado em ${formatarDataIso(dados.geradoEm)}`;
+      } catch (erro) {
+        areaErro.hidden = false;
+        areaErro.textContent = `Erro ao carregar kanban: ${erro.message}`;
+        statusEl.textContent = 'Falha na atualização.';
+      } finally {
+        btnAtualizar.disabled = false;
+      }
+    }
+
+    btnAtualizar.addEventListener('click', carregarKanban);
+    carregarKanban();
+    setInterval(carregarKanban, 5 * 60 * 1000);
+  </script>
+</body>
+</html>

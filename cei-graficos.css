@@ -1,0 +1,74 @@
+/* Gráficos CEI — estilos compartilhados (requer cei-tokens.css + cei-compartilhado.css + burndown-cei.css) */
+@import url("burndown-cei.css");
+
+.painel-grafico-generico {
+  background: var(--cor-painel);
+  border-radius: var(--raio-borda);
+  padding: 1rem;
+  box-shadow: var(--sombra-painel);
+  margin-bottom: 1rem;
+}
+
+.painel-grafico-generico .titulo-painel {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  color: var(--cor-primaria);
+}
+
+.grafico-container {
+  position: relative;
+  min-height: 320px;
+  height: min(52vh, 480px);
+}
+
+.grafico-container canvas {
+  max-height: 100%;
+}
+
+.painel-texto-grafico {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+  margin: 0 0 0.75rem;
+}
+
+.tabela-heatmap {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.tabela-heatmap th,
+.tabela-heatmap td {
+  border: 1px solid var(--cor-borda-suave);
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+}
+
+.tabela-heatmap th {
+  background: var(--cor-gantt-cabecalho-fundo);
+  font-weight: 600;
+}
+
+.celula-heatmap {
+  border-radius: 4px;
+  min-width: 2rem;
+}
+
+.painel-metricas-grafico .metrica-valor {
+  font-size: 1.35rem;
+}
+
+.grafico-container.grafico-container--oculto {
+  display: none;
+}
+
+#container-heatmap:not([hidden]) {
+  min-height: 200px;
+}
+
+@media (max-width: 768px) {
+  .grafico-container {
+    min-height: 260px;
+    height: 40vh;
+  }
+}

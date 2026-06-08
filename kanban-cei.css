@@ -1,0 +1,96 @@
+/* Kanban CEI — colunas e cartões (requer cei-tokens.css + cei-compartilhado.css) */
+.grade-kanban {
+  display: flex;
+  gap: var(--espacamento);
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  align-items: flex-start;
+}
+
+.coluna {
+  flex: 0 0 var(--largura-coluna);
+  background: var(--cor-coluna-fundo);
+  border-radius: var(--raio-borda);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.coluna-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.75rem;
+  border-top: 4px solid var(--cor-coluna, var(--cor-coluna-padrao));
+  background: var(--cor-painel);
+  border-radius: var(--raio-borda) var(--raio-borda) 0 0;
+}
+
+.coluna-cabecalho h2 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.coluna-contagem {
+  background: var(--cor-coluna, var(--cor-coluna-padrao));
+  color: var(--cor-contagem-texto);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  min-width: 1.4rem;
+  text-align: center;
+}
+
+.coluna-cartoes {
+  padding: 0.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.coluna-vazia {
+  margin: 0;
+  padding: 0.75rem;
+  text-align: center;
+  color: var(--cor-texto-suave);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.cartao {
+  background: var(--cor-painel);
+  border-radius: calc(var(--raio-borda) - 2px);
+  box-shadow: var(--sombra-painel);
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--cor-coluna, var(--cor-info));
+}
+
+.cartao-cabecalho { margin-bottom: 0.25rem; }
+
+.cartao-numero {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cor-texto-suave);
+}
+
+.cartao-titulo {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.cartao-titulo a {
+  color: var(--cor-link);
+  text-decoration: none;
+}
+
+.cartao-titulo a:hover { text-decoration: underline; }
+
+.cartao-meta { font-size: 0.72rem; color: var(--cor-texto-suave); }
+.cartao-meta-linha { margin-top: 0.15rem; }
+.meta-iteracao { display: block; margin-top: 0.2rem; font-style: italic; }

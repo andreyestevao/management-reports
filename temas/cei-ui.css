@@ -1,0 +1,11 @@
+/* Preset alinhado ao tema CEI (ui.scss — cores principais) */
+:root {
+  --cor-primaria: #003366;
+  --cor-fundo: #f5f7fa;
+  --cor-painel: #ffffff;
+  --raio-borda: 4px;
+  --cor-link: #003366;
+  --cor-grafico-real: #003366;
+  --cor-gantt-barra-iteracao-fundo: rgba(0, 51, 102, 0.15);
+  --cor-gantt-barra-iteracao-borda: rgba(0, 51, 102, 0.35);
+}

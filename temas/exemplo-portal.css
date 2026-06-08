@@ -1,0 +1,12 @@
+/* Exemplo de tema para portal incorporador — use ?css=/temas/exemplo-portal.css */
+:root {
+  --cor-primaria: #006633;
+  --cor-fundo: transparent;
+  --cor-painel: #ffffff;
+  --raio-borda: 6px;
+  --fonte-base: system-ui, "Segoe UI", sans-serif;
+  --padding-pagina-incorporar: 0;
+  --sombra-painel: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.cartao-titulo a { font-weight: 700; }

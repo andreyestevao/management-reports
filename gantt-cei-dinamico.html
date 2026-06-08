@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEI Apps — Gantt Roadmap</title>
+  <link rel="stylesheet" href="cei-tokens.css">
+  <link rel="stylesheet" href="cei-compartilhado.css">
+  <link rel="stylesheet" href="gantt-cei.css">
+  <script src="cei-tema.js"></script>
+</head>
+<body>
+  <div class="pagina pagina--incorporar" id="pagina-principal">
+    <div class="barra-controles">
+      <label for="busca-roadmap">Filtrar</label>
+      <input type="text" id="busca-roadmap" placeholder="Iteration ou situação…" spellcheck="false" />
+      <div class="filtros-situacao">
+        <label><input type="checkbox" id="filtro-ativa" checked /> Ativa</label>
+        <label><input type="checkbox" id="filtro-futura" checked /> Futuras</label>
+        <label><input type="checkbox" id="filtro-encerrada" checked /> Encerradas</label>
+      </div>
+      <button type="button" class="botao-atualizar" id="btn-atualizar">Atualizar</button>
+      <span class="status-carregamento" id="status">Consultando GitHub…</span>
+    </div>
+
+    <div id="area-erro" class="mensagem-erro" hidden></div>
+
+    <div class="painel-resumo" id="resumo" hidden></div>
+
+    <div class="legenda-gantt">
+      <span class="legenda-item"><span class="amostra-barra amostra-iteracao"></span> Iteration</span>
+      <span class="legenda-item"><span class="amostra-barra amostra-previsto"></span> Previsto (início iteration → Due Date)</span>
+      <span class="legenda-item"><span class="amostra-barra amostra-real"></span> Conclusão real</span>
+      <span class="legenda-item"><span class="amostra-barra amostra-atrasado"></span> Atrasado</span>
+      <span class="legenda-item">| <span class="legenda-hoje">Hoje</span></span>
+    </div>
+
+    <div class="gantt-container">
+      <div class="gantt-scroll" id="gantt-scroll">
+        <div class="gantt-grid" id="gantt-grid"></div>
+      </div>
+    </div>
+
+    <footer class="rodape">Gantt dinâmico · iterations ativas, arquivadas e Due Date do GitHub Projects</footer>
+  </div>
+
+  <script>
+    const btnAtualizar = document.getElementById('btn-atualizar');
+    const statusEl = document.getElementById('status');
+    const areaErro = document.getElementById('area-erro');
+    const ganttGrid = document.getElementById('gantt-grid');
+    const buscaInput = document.getElementById('busca-roadmap');
+    let debounceTimer = null;
+    let dadosAtuais = null;
+
+    function escapar(texto) {
+      const el = document.createElement('span');
+      el.textContent = texto ?? '';
+      return el.innerHTML;
+    }
+
+    function parseData(iso) {
+      return new Date(iso + 'T12:00:00');
+    }
+
+    function formatarData(iso) {
+      if (!iso) return '—';
+      return parseData(iso).toLocaleDateString('pt-BR');
+    }
+
+    function diasEntre(a, b) {
+      return Math.round((b - a) / 86400000);
+    }
+
+    function calcularPosicao(inicioPeriodo, fimPeriodo, inicioBarra, fimBarra) {
+      const total = Math.max(1, diasEntre(inicioPeriodo, fimPeriodo) + 1);
+      const inicio = Math.max(0, diasEntre(inicioPeriodo, inicioBarra));
+      const fim = Math.min(total - 1, diasEntre(inicioPeriodo, fimBarra));
+      const left = (inicio / total) * 100;
+      const width = ((fim - inicio + 1) / total) * 100;
+      return { left: `${left}%`, width: `${Math.max(width, 0.4)}%` };
+    }
+
+    function mesesNoPeriodo(inicioIso, fimIso) {
+      const meses = [];
+      let cursor = parseData(inicioIso);
+      const fim = parseData(fimIso);
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+      while (cursor <= fim) {
+        const proximo = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+        const fimMes = new Date(Math.min(proximo - 1, fim));
+        const inicioMes = cursor < parseData(inicioIso) ? parseData(inicioIso) : cursor;
+        meses.push({
+          rotulo: cursor.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }),
+          dias: diasEntre(inicioMes, fimMes) + 1,
+        });
+        cursor = proximo;
+      }
+      return meses;
+    }
+
+    function classeBadge(situacao) {
+      return `badge-situacao badge-${situacao || 'encerrada'}`;
+    }
+
+    function filtrarIteracoesLocal(dados) {
+      const q = buscaInput.value.trim().toLowerCase();
+      const mostrar = {
+        ativa: document.getElementById('filtro-ativa').checked,
+        futura: document.getElementById('filtro-futura').checked,
+        encerrada: document.getElementById('filtro-encerrada').checked,
+      };
+      return dados.iteracoes.filter((it) => {
+        if (!mostrar[it.situacao]) return false;
+        if (!q) return true;
+        const hay = `${it.titulo} ${it.inicio} ${it.fim} ${it.situacao}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    function criarBarra(classe, inicioPeriodo, fimPeriodo, inicioBarra, fimBarra, extra = '') {
+      const pos = calcularPosicao(inicioPeriodo, fimPeriodo, parseData(inicioBarra), parseData(fimBarra));
+      const el = document.createElement('div');
+      el.className = `gantt-barra ${classe} ${extra}`.trim();
+      el.style.left = pos.left;
+      el.style.width = pos.width;
+      el.title = `${formatarData(inicioBarra)} → ${formatarData(fimBarra)}`;
+      return el;
+    }
+
+    function renderizarGantt(dados) {
+      dadosAtuais = dados;
+      const iteracoes = filtrarIteracoesLocal(dados);
+      const inicioPeriodo = parseData(dados.periodo.inicio);
+      const fimPeriodo = parseData(dados.periodo.fim);
+      const meses = mesesNoPeriodo(dados.periodo.inicio, dados.periodo.fim);
+      const totalDiasMeses = meses.reduce((s, m) => s + m.dias, 0);
+
+      ganttGrid.innerHTML = '';
+      ganttGrid.style.setProperty('--total-meses', String(meses.length));
+
+      const cabEtiqueta = document.createElement('div');
+      cabEtiqueta.className = 'gantt-cabecalho-etiqueta';
+      cabEtiqueta.textContent = 'Iteration / Tarefa';
+      ganttGrid.appendChild(cabEtiqueta);
+
+      const cabTimeline = document.createElement('div');
+      cabTimeline.className = 'gantt-cabecalho-timeline';
+      const mesesEl = document.createElement('div');
+      mesesEl.className = 'gantt-meses';
+      for (const mes of meses) {
+        const bloco = document.createElement('div');
+        bloco.className = 'gantt-mes';
+        bloco.style.flexBasis = `${(mes.dias / totalDiasMeses) * 100}%`;
+        bloco.textContent = mes.rotulo;
+        mesesEl.appendChild(bloco);
+      }
+      cabTimeline.appendChild(mesesEl);
+      ganttGrid.appendChild(cabTimeline);
+
+      const posHoje = calcularPosicao(
+        inicioPeriodo, fimPeriodo,
+        parseData(dados.hoje), parseData(dados.hoje)
+      );
+
+      for (const iter of iteracoes) {
+        const linhaIt = document.createElement('div');
+        linhaIt.className = 'gantt-linha';
+
+        const etiqIt = document.createElement('div');
+        etiqIt.className = 'gantt-etiqueta gantt-etiqueta-iteracao';
+        etiqIt.innerHTML = `
+          ${escapar(iter.titulo)}
+          <span class="${classeBadge(iter.situacao)}">${escapar(iter.situacao)}</span>
+          <div class="gantt-etiqueta-meta">${formatarData(iter.inicio)} → ${formatarData(iter.fim)} · ${iter.totalItens} itens</div>`;
+        ganttGrid.appendChild(etiqIt);
+
+        const timeIt = document.createElement('div');
+        timeIt.className = 'gantt-timeline gantt-timeline-iteracao';
+        timeIt.appendChild(criarBarra('gantt-barra-iteracao', inicioPeriodo, fimPeriodo, iter.inicio, iter.fim));
+        const hojeIt = document.createElement('div');
+        hojeIt.className = 'gantt-linha-hoje';
+        hojeIt.style.left = posHoje.left;
+        timeIt.appendChild(hojeIt);
+        ganttGrid.appendChild(timeIt);
+
+        for (const item of iter.itens) {
+          const etiq = document.createElement('div');
+          etiq.className = 'gantt-etiqueta gantt-etiqueta-item';
+          const titulo = item.url
+            ? `<a href="${escapar(item.url)}" target="_blank" rel="noopener">#${item.numero} ${escapar(item.titulo)}</a>`
+            : escapar(item.titulo);
+          etiq.innerHTML = `
+            ${titulo}
+            <div class="gantt-etiqueta-meta">${escapar(item.status)} · previsto ${formatarData(item.dataPrevista || item.barra.fimPlanejado)}</div>`;
+          ganttGrid.appendChild(etiq);
+
+          const time = document.createElement('div');
+          time.className = 'gantt-timeline';
+          const atrasado = item.situacaoPrazo === 'atrasado' || item.situacaoPrazo === 'pendente_atrasado';
+          time.appendChild(criarBarra(
+            'gantt-barra-previsto',
+            inicioPeriodo, fimPeriodo,
+            item.barra.inicio, item.barra.fimPlanejado,
+            atrasado && !item.concluido ? 'gantt-barra-atrasado' : ''
+          ));
+          if (item.barra.fimReal) {
+            time.appendChild(criarBarra(
+              'gantt-barra-real',
+              inicioPeriodo, fimPeriodo,
+              item.barra.inicio, item.barra.fimReal
+            ));
+          }
+          const hojeLinha = document.createElement('div');
+          hojeLinha.className = 'gantt-linha-hoje';
+          hojeLinha.style.left = posHoje.left;
+          time.appendChild(hojeLinha);
+          ganttGrid.appendChild(time);
+        }
+      }
+
+      if (!iteracoes.length) {
+        ganttGrid.innerHTML = '<div class="gantt-vazio">Nenhuma iteration encontrada com os filtros atuais.</div>';
+      }
+    }
+
+    function renderizarResumo(dados) {
+      const r = dados.resumo;
+      document.getElementById('resumo').innerHTML = `
+        <span><strong>${r.totalIteracoes}</strong> iterations</span>
+        <span><strong>${r.totalItens}</strong> tarefas</span>
+        <span><strong>${r.ativas}</strong> ativa(s)</span>
+        <span><strong>${r.futuras}</strong> futura(s)</span>
+        <span><strong>${r.encerradas}</strong> encerrada(s)</span>
+        <span>Período: ${formatarData(dados.periodo.inicio)} → ${formatarData(dados.periodo.fim)}</span>`;
+      document.getElementById('resumo').hidden = false;
+    }
+
+    async function carregarGantt() {
+      btnAtualizar.disabled = true;
+      statusEl.textContent = 'Consultando GitHub…';
+      areaErro.hidden = true;
+
+      try {
+        const resposta = await fetch('/api/gantt', { cache: 'no-store' });
+        const dados = await window.ceiApi.lerRespostaJson(resposta);
+        if (!resposta.ok) throw new Error(dados.detalhe || dados.erro || `HTTP ${resposta.status}`);
+
+        document.title = `${dados.projeto.titulo} — Gantt Roadmap`;
+        renderizarResumo(dados);
+        renderizarGantt(dados);
+        statusEl.textContent =
+          `${dados.resumo.totalIteracoes} iterations · ${dados.resumo.totalItens} tarefas · ${new Date(dados.geradoEm).toLocaleString('pt-BR')}`;
+      } catch (erro) {
+        areaErro.hidden = false;
+        areaErro.textContent = `Erro: ${erro.message}`;
+        statusEl.textContent = 'Falha na atualização';
+      } finally {
+        btnAtualizar.disabled = false;
+      }
+    }
+
+    function agendarRefiltro() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if (dadosAtuais) renderizarGantt(dadosAtuais);
+      }, 200);
+    }
+
+    btnAtualizar.addEventListener('click', carregarGantt);
+    buscaInput.addEventListener('input', agendarRefiltro);
+    for (const id of ['filtro-ativa', 'filtro-futura', 'filtro-encerrada']) {
+      document.getElementById(id).addEventListener('change', () => {
+        if (dadosAtuais) renderizarGantt(dadosAtuais);
+      });
+    }
+
+    carregarGantt();
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+/* Preset transparente — embed em painéis coloridos do site pai */
+:root {
+  --cor-fundo: transparent;
+  --cor-painel: rgba(255, 255, 255, 0.92);
+  --cor-coluna-fundo: rgba(233, 236, 239, 0.85);
+  --sombra-painel: none;
+  --padding-pagina: 0;
+  --padding-pagina-incorporar: 0;
+}
+
+body,
+.pagina {
+  background: transparent !important;
+}

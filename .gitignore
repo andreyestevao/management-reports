@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Runtime / dados locais (snapshots gerados pelo servidor)
+dados/burndown-historico.json
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# SO / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# Logs e temporários
+*.log
+*.tmp
+.cache/
+
+# Kanban estático regenerável (opcional — descomente se não quiser versionar)
+# kanban-cei-apps.html
+# kanban-cei-apps-incorporar.html

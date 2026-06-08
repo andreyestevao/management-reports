@@ -1,0 +1,29 @@
+/* Preset escuro */
+:root {
+  --cor-primaria: #4da3ff;
+  --cor-fundo: #1a1d21;
+  --cor-painel: #25282c;
+  --cor-texto: #e9ecef;
+  --cor-texto-suave: #adb5bd;
+  --cor-link: #7eb8ff;
+  --cor-coluna-fundo: #2d3136;
+  --cor-borda: #3d4248;
+  --cor-borda-suave: #34383e;
+  --cor-input-borda: #495057;
+  --cor-sugestao-fundo: #25282c;
+  --cor-sugestao-hover: #2d3136;
+  --cor-sugestao-rodape: #2d3136;
+  --cor-erro-fundo: #3d1f24;
+  --cor-erro-texto: #f8d7da;
+  --cor-erro-borda: #842029;
+  --cor-gantt-cabecalho-fundo: #2d3136;
+  --cor-gantt-linha-fundo: #25282c;
+  --cor-gantt-linha-iteracao-fundo: #2a3440;
+  --cor-gantt-timeline-iteracao-fundo: #232830;
+  --cor-gantt-grade-clara: #2d3136;
+  --cor-grafico-concluido: #4ade80;
+  --cor-grafico-concluido-preenchimento: rgba(74, 222, 128, 0.15);
+  --cor-grafico-escopo: #adb5bd;
+  --cor-grafico-ideal-burnup: rgba(77, 163, 255, 0.55);
+  --sombra-painel: 0 1px 3px rgba(0, 0, 0, 0.35);
+}

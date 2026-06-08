@@ -1,0 +1,9 @@
+/* Preset claro — fundo branco, contraste suave */
+:root {
+  --cor-fundo: #ffffff;
+  --cor-painel: #ffffff;
+  --cor-coluna-fundo: #f8f9fa;
+  --sombra-painel: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --padding-pagina: 0.75rem;
+  --padding-pagina-incorporar: 0;
+}

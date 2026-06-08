@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEI Apps — Status portfolio</title>
+  <link rel="stylesheet" href="cei-tokens.css">
+  <link rel="stylesheet" href="cei-compartilhado.css">
+  <link rel="stylesheet" href="cei-graficos.css">
+  <script src="cei-tema.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+  <div class="pagina pagina--incorporar" id="pagina-principal">
+    <div class="barra-controles">
+      
+      <button type="button" class="botao-atualizar" id="btn-atualizar">Atualizar</button>
+      <span class="status-carregamento" id="status">Consultando GitHub…</span>
+    </div>
+
+    <div id="area-erro" class="mensagem-erro" hidden></div>
+    <div class="painel-metricas" id="metricas" hidden></div>
+    <p id="texto-grafico" class="painel-texto-grafico" hidden></p>
+
+    <section class="painel-grafico-generico">
+      <h2 class="titulo-painel">Status portfolio</h2>
+      <div class="grafico-container"><canvas id="grafico-principal"></canvas></div>
+      <div id="container-heatmap" hidden></div>
+    </section>
+
+    <footer class="rodape">Status portfolio dinâmico · API /api/status-portfolio</footer>
+  </div>
+
+  <script>
+    window.CEI_GRAFICO_CONFIG = {
+      api: 'status-portfolio',
+      titulo: 'Status portfolio',
+      requerIteracao: false
+    };
+  </script>
+  <script src="cei-grafico-app.js"></script>
+</body>
+</html>

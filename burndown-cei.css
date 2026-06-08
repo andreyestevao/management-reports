@@ -1,0 +1,131 @@
+/* Burndown CEI (requer cei-tokens.css + cei-compartilhado.css) */
+.autocomplete-iteracao {
+  position: relative;
+  min-width: 320px;
+  flex: 1 1 320px;
+  max-width: 480px;
+}
+
+.autocomplete-iteracao input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--cor-input-borda);
+  border-radius: var(--raio-borda);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.autocomplete-iteracao input:focus {
+  outline: 2px solid var(--cor-foco-anel);
+  border-color: var(--cor-primaria);
+}
+
+.lista-sugestoes {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--cor-sugestao-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-painel);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lista-sugestoes[hidden] { display: none; }
+
+.item-sugestao {
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--cor-borda-suave);
+  font-size: 0.84rem;
+}
+
+.item-sugestao:last-child { border-bottom: none; }
+
+.item-sugestao:hover,
+.item-sugestao.ativo { background: var(--cor-sugestao-hover); }
+
+.item-sugestao-titulo { font-weight: 600; color: var(--cor-primaria); }
+
+.item-sugestao-meta {
+  font-size: 0.78rem;
+  color: var(--cor-texto-suave);
+  margin-top: 0.15rem;
+}
+
+.rodape-lista-sugestoes {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--cor-texto-suave);
+  text-align: center;
+  border-top: 1px solid var(--cor-borda);
+  background: var(--cor-sugestao-rodape);
+}
+
+.painel-metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.metrica {
+  background: var(--cor-painel);
+  border-radius: var(--raio-borda);
+  padding: 0.75rem 1rem;
+  box-shadow: var(--sombra-painel);
+}
+
+.metrica-valor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--cor-primaria);
+}
+
+.metrica-rotulo { font-size: 0.78rem; color: var(--cor-texto-suave); }
+
+.metrica-detalhe {
+  font-size: 0.72rem;
+  color: var(--cor-texto-suave);
+  margin-top: 0.2rem;
+}
+
+.painel-velocidade,
+.painel-grafico {
+  background: var(--cor-painel);
+  border-radius: var(--raio-borda);
+  padding: 0.85rem 1rem;
+  box-shadow: var(--sombra-painel);
+  margin-bottom: 1rem;
+  font-size: 0.84rem;
+}
+
+.painel-grafico { padding: 1rem; }
+
+.painel-velocidade h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--cor-primaria);
+}
+
+.grafico-container { position: relative; height: 380px; }
+
+.lista-escopo { font-size: 0.82rem; }
+.lista-escopo table { width: 100%; border-collapse: collapse; }
+
+.lista-escopo th,
+.lista-escopo td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--cor-borda);
+  text-align: left;
+}
+
+.metrica-valor.positivo { font-weight: 700; }
+.metrica-valor.negativo { font-weight: 700; }
+.metrica-valor.neutro { font-weight: 700; }

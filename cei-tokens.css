@@ -1,0 +1,75 @@
+/* Tokens visuais — Kanban, Burndown e Gantt CEI (contrato de tema para incorporação) */
+:root {
+  --cor-primaria: #003366;
+  --cor-fundo: #f5f7fa;
+  --cor-painel: #ffffff;
+  --cor-texto: #212529;
+  --cor-texto-suave: #6c757d;
+  --cor-link: var(--cor-primaria);
+  --cor-botao-texto: #ffffff;
+
+  --cor-borda: #dee2e6;
+  --cor-borda-suave: #f1f3f5;
+  --cor-input-borda: #ced4da;
+  --raio-borda: 8px;
+  --sombra-painel: 0 1px 3px rgba(0, 51, 102, 0.08);
+
+  --padding-pagina: 1rem;
+  --padding-pagina-incorporar: 0.5rem;
+  --espacamento: 12px;
+  --fonte-base: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --largura-coluna: 300px;
+
+  --cor-coluna-fundo: #e9ecef;
+  --cor-coluna-padrao: #6c757d;
+  --cor-contagem-texto: #ffffff;
+
+  --cor-positivo: #198754;
+  --cor-negativo: #dc3545;
+  --cor-neutro: #fd7e14;
+  --cor-info: #0d6efd;
+
+  --cor-erro-fundo: #f8d7da;
+  --cor-erro-texto: #842029;
+  --cor-erro-borda: #f5c2c7;
+
+  --cor-badge-ativa-fundo: #cfe2ff;
+  --cor-badge-ativa-texto: #084298;
+  --cor-badge-encerrada-fundo: #e2e3e5;
+  --cor-badge-encerrada-texto: #41464b;
+  --cor-badge-futura-fundo: #fff3cd;
+  --cor-badge-futura-texto: #664d03;
+
+  --cor-sugestao-fundo: #ffffff;
+  --cor-sugestao-hover: #f8f9fa;
+  --cor-sugestao-rodape: #fafafa;
+  --cor-foco-anel: rgba(0, 51, 102, 0.25);
+
+  --cor-grafico-ideal: #6c757d;
+  --cor-grafico-real: var(--cor-primaria);
+  --cor-grafico-real-preenchimento: rgba(0, 51, 102, 0.08);
+
+  --cor-grafico-escopo: #6c757d;
+  --cor-grafico-concluido: #198754;
+  --cor-grafico-concluido-preenchimento: rgba(25, 135, 84, 0.12);
+  --cor-grafico-ideal-burnup: rgba(0, 51, 102, 0.45);
+
+  --cor-gantt-cabecalho-fundo: #f8f9fa;
+  --cor-gantt-linha-fundo: #ffffff;
+  --cor-gantt-linha-iteracao-fundo: #eef3f8;
+  --cor-gantt-timeline-iteracao-fundo: #f8fbff;
+  --cor-gantt-grade-clara: #fafafa;
+  --cor-gantt-hoje: #fd7e14;
+  --cor-gantt-barra-iteracao-fundo: rgba(0, 51, 102, 0.15);
+  --cor-gantt-barra-iteracao-borda: rgba(0, 51, 102, 0.35);
+  --cor-gantt-barra-previsto-fundo: rgba(13, 110, 253, 0.45);
+  --cor-gantt-barra-previsto-borda: rgba(13, 110, 253, 0.65);
+  --cor-gantt-barra-real-fundo: rgba(25, 135, 84, 0.7);
+  --cor-gantt-barra-real-borda: rgba(25, 135, 84, 0.85);
+  --cor-gantt-barra-atrasado-fundo: rgba(220, 53, 69, 0.45);
+  --cor-gantt-barra-atrasado-borda: #dc3545;
+}
+
+@media (max-width: 768px) {
+  :root { --largura-coluna: 85vw; }
+}

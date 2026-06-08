@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEI Apps — Burndown</title>
+  <link rel="stylesheet" href="cei-tokens.css">
+  <link rel="stylesheet" href="cei-compartilhado.css">
+  <link rel="stylesheet" href="burndown-cei.css">
+  <script src="cei-tema.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="pagina pagina--incorporar" id="pagina-principal">
+    <div class="barra-controles">
+      <label for="busca-iteracao">Iteration</label>
+      <div class="autocomplete-iteracao" id="autocomplete-iteracao">
+        <input
+          type="text"
+          id="busca-iteracao"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Pesquisar iteration…"
+          aria-autocomplete="list"
+          aria-controls="lista-sugestoes-iteracao"
+          aria-expanded="false"
+        />
+        <ul id="lista-sugestoes-iteracao" class="lista-sugestoes" role="listbox" hidden></ul>
+      </div>
+      <button type="button" class="botao-atualizar" id="btn-atualizar">Atualizar</button>
+      <span class="status-carregamento" id="status">Consultando GitHub…</span>
+    </div>
+
+    <div id="area-erro" class="mensagem-erro" hidden></div>
+
+    <div class="painel-metricas" id="metricas" hidden>
+      <div class="metrica"><div class="metrica-valor" id="m-total">—</div><div class="metrica-rotulo">Escopo</div></div>
+      <div class="metrica"><div class="metrica-valor" id="m-concluido">—</div><div class="metrica-rotulo">Concluído</div></div>
+      <div class="metrica"><div class="metrica-valor" id="m-restante">—</div><div class="metrica-rotulo">Restante</div></div>
+      <div class="metrica"><div class="metrica-valor" id="m-progresso">—</div><div class="metrica-rotulo">Progresso</div></div>
+      <div class="metrica"><div class="metrica-valor" id="m-velocidade-real">—</div><div class="metrica-rotulo">Velocidade real</div><div class="metrica-detalhe" id="m-velocidade-real-det">itens/dia</div></div>
+      <div class="metrica"><div class="metrica-valor" id="m-indice-ritmo">—</div><div class="metrica-rotulo">Índice de ritmo</div><div class="metrica-detalhe" id="m-indice-ritmo-det">vs planejado</div></div>
+      <div class="metrica"><div class="metrica-valor" id="m-desvio-medio">—</div><div class="metrica-rotulo">Desvio médio</div><div class="metrica-detalhe" id="m-desvio-medio-det">conclusão vs previsto</div></div>
+      <div class="metrica"><div class="metrica-valor" id="m-no-prazo">—</div><div class="metrica-rotulo">No prazo</div><div class="metrica-detalhe" id="m-no-prazo-det">entregas com Due Date</div></div>
+    </div>
+
+    <section class="painel-velocidade" id="painel-velocidade" hidden>
+      <h2>Velocidade do time</h2>
+      <p id="texto-velocidade"></p>
+    </section>
+
+    <section class="painel-grafico">
+      <h2 class="titulo-painel">Burndown da iteration</h2>
+      <div class="grafico-container"><canvas id="grafico-burndown"></canvas></div>
+    </section>
+
+    <section class="painel-grafico lista-escopo">
+      <h2 class="titulo-painel">Itens no escopo</h2>
+      <table>
+        <thead><tr><th>#</th><th>Título</th><th>Status</th><th>Previsto</th><th>Situação</th><th>Desvio</th></tr></thead>
+        <tbody id="corpo-escopo"></tbody>
+      </table>
+    </section>
+
+    <footer class="rodape">Burndown dinâmico · snapshots em dados/burndown-historico.json</footer>
+  </div>
+
+  <script>
+    const POR_PAGINA = 10;
+    const inputIteracao = document.getElementById('busca-iteracao');
+    const listaSugestoes = document.getElementById('lista-sugestoes-iteracao');
+    const autocompleteEl = document.getElementById('autocomplete-iteracao');
+    const btnAtualizar = document.getElementById('btn-atualizar');
+    const statusEl = document.getElementById('status');
+    const areaErro = document.getElementById('area-erro');
+    const ctx = document.getElementById('grafico-burndown');
+    let grafico = null;
+    let ultimosDadosGrafico = null;
+    let iteracaoSelecionadaId = null;
+    let rotuloSelecionado = '';
+    let consultaAtual = '';
+    let offsetAtual = 0;
+    let totalResultados = 0;
+    let temMaisResultados = false;
+    let carregandoSugestoes = false;
+    let debounceTimer = null;
+    let indiceAtivo = -1;
+    let seqBusca = 0;
+
+    function escapar(texto) {
+      const el = document.createElement('span');
+      el.textContent = texto ?? '';
+      return el.innerHTML;
+    }
+
+    function formatarPeriodo(inicio, fim) {
+      const fmt = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR');
+      return `${fmt(inicio)} → ${fmt(fim)}`;
+    }
+
+    function rotuloSituacao(situacao) {
+      return ({ encerrada: 'encerrada', ativa: 'ativa', futura: 'futura' })[situacao] || situacao;
+    }
+
+    function rotuloItemIteracao(it) {
+      return `${it.titulo} (${formatarPeriodo(it.inicio, it.fim)})`;
+    }
+
+    function classeBadgeSituacao(situacao) {
+      return `badge-situacao badge-situacao-${situacao || 'encerrada'}`;
+    }
+
+    function definirIteracaoSelecionada(it) {
+      iteracaoSelecionadaId = it.id;
+      rotuloSelecionado = rotuloItemIteracao(it);
+      inputIteracao.value = rotuloSelecionado;
+      inputIteracao.placeholder = 'Pesquisar iteration…';
+      fecharSugestoes();
+    }
+
+    function abrirSugestoes() {
+      listaSugestoes.hidden = false;
+      inputIteracao.setAttribute('aria-expanded', 'true');
+    }
+
+    function fecharSugestoes() {
+      listaSugestoes.hidden = true;
+      inputIteracao.setAttribute('aria-expanded', 'false');
+      indiceAtivo = -1;
+    }
+
+    function criarItemSugestao(it) {
+      const li = document.createElement('li');
+      li.className = 'item-sugestao';
+      li.role = 'option';
+      li.dataset.id = it.id;
+      li.innerHTML = `
+        <div class="item-sugestao-titulo">
+          ${escapar(it.titulo)}
+          <span class="${classeBadgeSituacao(it.situacao)}">${escapar(rotuloSituacao(it.situacao))}</span>
+        </div>
+        <div class="item-sugestao-meta">${escapar(formatarPeriodo(it.inicio, it.fim))}</div>`;
+      li.addEventListener('mousedown', (evento) => {
+        evento.preventDefault();
+        definirIteracaoSelecionada(it);
+        carregarBurndown(it.id);
+      });
+      return li;
+    }
+
+    function atualizarRodapeLista() {
+      let rodape = listaSugestoes.querySelector('.rodape-lista-sugestoes');
+      if (!rodape) {
+        rodape = document.createElement('li');
+        rodape.className = 'rodape-lista-sugestoes';
+        rodape.setAttribute('aria-hidden', 'true');
+        listaSugestoes.appendChild(rodape);
+      }
+      const exibidos = listaSugestoes.querySelectorAll('.item-sugestao').length;
+      if (carregandoSugestoes) {
+        rodape.textContent = 'Carregando…';
+      } else if (!exibidos) {
+        rodape.textContent = consultaAtual ? 'Nenhuma iteration encontrada' : 'Sem iterations';
+      } else {
+        rodape.textContent = temMaisResultados
+          ? `${exibidos} de ${totalResultados} · role para carregar mais`
+          : `${exibidos} de ${totalResultados}`;
+      }
+    }
+
+    async function buscarSugestoes(resetar = true) {
+      if (carregandoSugestoes && !resetar) return;
+      const seq = ++seqBusca;
+
+      if (resetar) {
+        offsetAtual = 0;
+        listaSugestoes.querySelectorAll('.item-sugestao').forEach((el) => el.remove());
+      }
+
+      carregandoSugestoes = true;
+      abrirSugestoes();
+      atualizarRodapeLista();
+
+      const params = new URLSearchParams({
+        q: consultaAtual,
+        offset: String(offsetAtual),
+        limit: String(POR_PAGINA),
+      });
+
+      try {
+        const resposta = await fetch(`/api/iteracoes?${params}`, { cache: 'no-store' });
+        const dados = await window.ceiApi.lerRespostaJson(resposta);
+        if (seq !== seqBusca) return;
+        if (!resposta.ok) throw new Error(dados.detalhe || dados.erro || `HTTP ${resposta.status}`);
+
+        totalResultados = dados.total;
+        temMaisResultados = dados.temMais;
+        offsetAtual += dados.itens.length;
+
+        const rodape = listaSugestoes.querySelector('.rodape-lista-sugestoes');
+        for (const it of dados.itens) {
+          listaSugestoes.insertBefore(criarItemSugestao(it), rodape);
+        }
+      } catch (erro) {
+        if (seq !== seqBusca) return;
+        const rodape = listaSugestoes.querySelector('.rodape-lista-sugestoes');
+        if (rodape) rodape.textContent = `Erro: ${erro.message}`;
+      } finally {
+        if (seq === seqBusca) {
+          carregandoSugestoes = false;
+          atualizarRodapeLista();
+        }
+      }
+    }
+
+    function agendarBusca(resetar = true) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => buscarSugestoes(resetar), 280);
+    }
+
+    function sincronizarInputComIteracao(it) {
+      if (!it) return;
+      iteracaoSelecionadaId = it.id;
+      rotuloSelecionado = rotuloItemIteracao(it);
+      inputIteracao.value = rotuloSelecionado;
+    }
+
+    function lerCorGrafico(token, fallback) {
+      return (window.ceiTema?.lerToken(token) || fallback).trim() || fallback;
+    }
+
+    function renderizarGrafico(dados) {
+      ultimosDadosGrafico = dados;
+      const g = dados.grafico;
+      if (grafico) grafico.destroy();
+      grafico = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: g.labels,
+          datasets: [
+            {
+              label: 'Ideal',
+              data: g.serieIdeal,
+              borderColor: lerCorGrafico('--cor-grafico-ideal', '#6c757d'),
+              borderDash: [6, 4],
+              pointRadius: 0,
+              tension: 0,
+            },
+            {
+              label: 'Real',
+              data: g.serieReal,
+              borderColor: lerCorGrafico('--cor-grafico-real', '#003366'),
+              backgroundColor: lerCorGrafico('--cor-grafico-real-preenchimento', 'rgba(0, 51, 102, 0.08)'),
+              fill: true,
+              tension: 0.15,
+              pointRadius: 3,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Itens restantes' },
+            },
+            x: { title: { display: true, text: 'Dia da iteration' } },
+          },
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y ?? '—'}`,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    function formatarData(iso) {
+      if (!iso) return '—';
+      return new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR');
+    }
+
+    function classeIndice(valor, invertido = false) {
+      if (valor == null || Number.isNaN(valor)) return '';
+      const ok = invertido ? valor <= 0 : valor >= 100;
+      const neutro = invertido ? Math.abs(valor) <= 1 : valor >= 85 && valor < 105;
+      if (ok) return 'positivo';
+      if (neutro) return 'neutro';
+      return 'negativo';
+    }
+
+    function rotuloSituacaoPrazo(situacao) {
+      return ({
+        adiantado: 'Adiantado',
+        no_prazo: 'No prazo',
+        atrasado: 'Atrasado',
+        pendente_atrasado: 'Pendente · atrasado',
+        pendente: 'Pendente',
+      })[situacao] || '—';
+    }
+
+    function formatarDesvio(desvio) {
+      if (desvio == null) return '—';
+      if (desvio === 0) return '0 dia';
+      return `${desvio > 0 ? '+' : ''}${desvio} dia${Math.abs(desvio) === 1 ? '' : 's'}`;
+    }
+
+    function renderizarVelocidade(v) {
+      const elReal = document.getElementById('m-velocidade-real');
+      const elIndice = document.getElementById('m-indice-ritmo');
+      const elDesvio = document.getElementById('m-desvio-medio');
+      const elNoPrazo = document.getElementById('m-no-prazo');
+
+      elReal.textContent = v.itensPorDiaReal.toFixed(2);
+      elReal.className = 'metrica-valor ' + classeIndice(v.indiceRitmoPercentual);
+      document.getElementById('m-velocidade-real-det').textContent =
+        `planejado ${v.itensPorDiaPlanejado.toFixed(2)}/dia · necessário ${v.itensPorDiaNecessario.toFixed(2)}/dia`;
+
+      elIndice.textContent = `${v.indiceRitmoPercentual}%`;
+      elIndice.className = 'metrica-valor ' + classeIndice(v.indiceRitmoPercentual);
+      document.getElementById('m-indice-ritmo-det').textContent = v.rotuloRitmo;
+
+      if (v.desvioMedioDias != null) {
+        elDesvio.textContent = formatarDesvio(v.desvioMedioDias);
+        elDesvio.className = 'metrica-valor ' + classeIndice(v.desvioMedioDias, true);
+      } else {
+        elDesvio.textContent = '—';
+        elDesvio.className = 'metrica-valor';
+      }
+      document.getElementById('m-desvio-medio-det').textContent = v.rotuloPrazo;
+
+      if (v.percentualNoPrazo != null) {
+        elNoPrazo.textContent = `${v.percentualNoPrazo}%`;
+        elNoPrazo.className = 'metrica-valor ' + classeIndice(v.percentualNoPrazo);
+      } else {
+        elNoPrazo.textContent = '—';
+        elNoPrazo.className = 'metrica-valor';
+      }
+      document.getElementById('m-no-prazo-det').textContent =
+        `${v.entreguesNoPrazo}/${v.concluidosComDataPrevista || 0} entregues · ${v.pendentesAtrasados} pendente(s) atrasado(s)`;
+
+      document.getElementById('texto-velocidade').textContent =
+        `Ritmo real de ${v.itensPorDiaReal.toFixed(2)} itens/dia (${v.diasDecorridos} de ${v.totalDiasIteration} dias) ` +
+        `frente ao planejado de ${v.itensPorDiaPlanejado.toFixed(2)} itens/dia. ` +
+        `Progresso ${v.indiceProgressoPercentual}% do esperado linear na iteration.`;
+      document.getElementById('painel-velocidade').hidden = false;
+    }
+
+    function renderizarEscopo(itens) {
+      const corpo = document.getElementById('corpo-escopo');
+      corpo.innerHTML = itens.map((item) => {
+        const prazo = item.situacaoPrazo ? rotuloSituacaoPrazo(item.situacaoPrazo) : '—';
+        const classePrazo = item.situacaoPrazo ? `badge-prazo-${item.situacaoPrazo}` : '';
+        return `
+        <tr>
+          <td>${item.numero ? '#' + item.numero : '—'}</td>
+          <td>${item.url ? `<a href="${escapar(item.url)}" target="_blank" rel="noopener">${escapar(item.titulo)}</a>` : escapar(item.titulo)}</td>
+          <td>${escapar(item.status)}</td>
+          <td>${formatarData(item.dataPrevista)}</td>
+          <td class="${item.concluido ? 'badge-concluido' : 'badge-restante'} ${classePrazo}">
+            ${item.concluido
+              ? 'Concluído' + (item.concluidoEm ? ' · ' + escapar(formatarData(item.concluidoEm)) : '')
+              : (prazo !== '—' ? prazo : 'Restante')}
+          </td>
+          <td>${formatarDesvio(item.desvioDias)}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="6">Nenhum item nesta iteration</td></tr>';
+    }
+
+    function renderizarPainel(dados) {
+      const it = dados.iteracao;
+      document.title = `${dados.projeto.titulo} — Burndown — ${it.titulo}`;
+
+      sincronizarInputComIteracao(it);
+
+      const m = dados.metricas;
+      document.getElementById('m-total').textContent = m.totalEscopo;
+      document.getElementById('m-concluido').textContent = m.concluido;
+      document.getElementById('m-restante').textContent = m.restante;
+      document.getElementById('m-progresso').textContent = m.progressoPercentual + '%';
+      document.getElementById('metricas').hidden = false;
+
+      if (dados.velocidade) renderizarVelocidade(dados.velocidade);
+
+      renderizarGrafico(dados);
+      renderizarEscopo(dados.itensEscopo);
+    }
+
+    async function carregarBurndown(iteracaoId) {
+      btnAtualizar.disabled = true;
+      statusEl.textContent = 'Consultando GitHub…';
+      areaErro.hidden = true;
+
+      const url = iteracaoId ? `/api/burndown?iteracao=${encodeURIComponent(iteracaoId)}` : '/api/burndown';
+
+      try {
+        const resposta = await fetch(url, { cache: 'no-store' });
+        const dados = await window.ceiApi.lerRespostaJson(resposta);
+        if (!resposta.ok) throw new Error(dados.detalhe || dados.erro || `HTTP ${resposta.status}`);
+        renderizarPainel(dados);
+        const it = dados.iteracao;
+        statusEl.textContent =
+          `${it.titulo} · ${formatarPeriodo(it.inicio, it.fim)} · ${rotuloSituacao(it.situacao)}`;
+      } catch (erro) {
+        areaErro.hidden = false;
+        areaErro.textContent = `Erro: ${erro.message}`;
+        statusEl.textContent = 'Falha na atualização';
+      } finally {
+        btnAtualizar.disabled = false;
+      }
+    }
+
+    inputIteracao.addEventListener('focus', () => {
+      inputIteracao.placeholder = rotuloSelecionado || 'Pesquisar iteration…';
+      inputIteracao.value = '';
+      consultaAtual = '';
+      agendarBusca(true);
+    });
+
+    inputIteracao.addEventListener('blur', () => {
+      window.setTimeout(() => {
+        if (autocompleteEl.contains(document.activeElement)) return;
+        if (iteracaoSelecionadaId && rotuloSelecionado) {
+          inputIteracao.value = rotuloSelecionado;
+        }
+        inputIteracao.placeholder = 'Pesquisar iteration…';
+        fecharSugestoes();
+      }, 120);
+    });
+
+    inputIteracao.addEventListener('input', () => {
+      consultaAtual = inputIteracao.value.trim();
+      iteracaoSelecionadaId = null;
+      agendarBusca(true);
+    });
+
+    inputIteracao.addEventListener('keydown', (evento) => {
+      const itens = [...listaSugestoes.querySelectorAll('.item-sugestao')];
+      if (evento.key === 'ArrowDown') {
+        evento.preventDefault();
+        if (listaSugestoes.hidden) agendarBusca(true);
+        indiceAtivo = Math.min(indiceAtivo + 1, itens.length - 1);
+      } else if (evento.key === 'ArrowUp') {
+        evento.preventDefault();
+        indiceAtivo = Math.max(indiceAtivo - 1, 0);
+      } else if (evento.key === 'Enter' && indiceAtivo >= 0 && itens[indiceAtivo]) {
+        evento.preventDefault();
+        itens[indiceAtivo].dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        return;
+      } else if (evento.key === 'Escape') {
+        fecharSugestoes();
+        return;
+      } else {
+        return;
+      }
+
+      itens.forEach((el, idx) => el.classList.toggle('ativo', idx === indiceAtivo));
+      if (itens[indiceAtivo]) itens[indiceAtivo].scrollIntoView({ block: 'nearest' });
+    });
+
+    listaSugestoes.addEventListener('scroll', () => {
+      if (!temMaisResultados || carregandoSugestoes) return;
+      const faltam = listaSugestoes.scrollHeight - listaSugestoes.scrollTop - listaSugestoes.clientHeight;
+      if (faltam < 48) buscarSugestoes(false);
+    });
+
+    document.addEventListener('click', (evento) => {
+      if (!autocompleteEl.contains(evento.target)) fecharSugestoes();
+    });
+
+    btnAtualizar.addEventListener('click', () => carregarBurndown(iteracaoSelecionadaId || undefined));
+    carregarBurndown(new URLSearchParams(location.search).get('iteracao') || undefined);
+
+    document.addEventListener('cei-tema-alterado', () => {
+      if (ultimosDadosGrafico) renderizarGrafico(ultimosDadosGrafico);
+    });
+  </script>
+</body>
+</html>
